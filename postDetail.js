@@ -83,4 +83,6 @@ function createPost(){
 	});
 	
 	post.appendChild(divPost);
+	
+	//work from here
 }

@@ -100,6 +100,7 @@ submit_button.addEventListener("click",function(){
 		post_array[selectedPost[0].index].title=title_field.value;
 		post_array[selectedPost[0].index].body=body_field.value;
 	}
+	localStorage.selectedPosts= JSON.stringify([]);
 	storePost(post_array);
 	window.location.assign("indexPage.html");
 });

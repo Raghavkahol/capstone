@@ -3,6 +3,9 @@ var all_posts=document.getElementById("forumPost");
 var post_list=[];
 post_list=localStoragePosts();
 
+var selectedPostIndex=[];
+selectedPostIndex=localSelectedPosts();
+
 var createButton=document.createElement("button");
 createButton.setAttribute("id","createButton_id");
 createButton.setAttribute("style","float:right");
@@ -10,6 +13,8 @@ createButton.innerHTML="Create New Post";
 all_posts.appendChild(createButton);
 
 createButton.addEventListener("click",function(){
+		localStorage.selectedPosts= JSON.stringify([]);
+		selectedPostIndex=localSelectedPosts();
 		window.location.assign("forum.html");
 });
 
@@ -57,8 +62,7 @@ function horizontalLine( postDiv ){
 	postDiv.appendChild(horizontalLine);
 }
 
-var selectedPostIndex=[];
-selectedPostIndex=localSelectedPosts();
+
 
 function createPost(){
   for(var i=post_list.length-1;i>=0;i--){
@@ -84,9 +88,11 @@ function createPost(){
 	detail.innerHTML="Read More";
 	new_post.appendChild(detail);
 	 detail.addEventListener("click",function(){
+		 localStorage.selectedPosts= JSON.stringify([]);
+		 selectedPostIndex=localSelectedPosts();
 		 var target=event.target.parentNode;
 		 var index=searchFromPostArray(parseInt(target.id));
-	
+		
 		 var objIndex=new Object();
 		 objIndex.index=index;
 		 selectedPostIndex.push(objIndex);
