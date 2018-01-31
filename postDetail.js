@@ -147,7 +147,10 @@ for(var i=0;i<comments.length;i++)
 	commentId=comments[i].CommentId;
 	AddToCommentDom(comments[i]);
 	}
-	var addComment=document.createElement("button");
+	
+	
+}
+var addComment=document.createElement("button");
 	addComment.setAttribute("id","addComment");
 	addComment.innerHTML="Add Comment";
 	divPost.appendChild(addComment);
@@ -163,8 +166,7 @@ for(var i=0;i<comments.length;i++)
 });
 	
 		newLine(divPost);
-	
-}}
+		}
 function createPostComment()
 	{
 	var postCommentDiv=document.createElement("div");
@@ -210,13 +212,16 @@ function createPostComment()
 	if(flag==0)
 	{
 	postbtn.addEventListener("click",function(event){
-		comment_box=0;
-		commentId++;
 	
+	if(!postbtn.innerHTML){
+		alert("Comment can't be empty");
+	}else{
+			comment_box=0;
+		commentId++;
 		AddToCommentArray();
 		deleteDiv();
 		storeCommentsIntoLocalStorage(comments);
-		
+	}
 	});
 	}
 	}
