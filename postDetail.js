@@ -46,6 +46,7 @@ function localStoragePosts(){
 }
 var commentId=0;
 var comments=[];
+comments=storeIntoLocalStorage();
 var flag=0;
 var comment_box=0;
 var view_comment=0;
@@ -80,9 +81,11 @@ function createPost(){
 	delete_button.innerHTML="Delete";
 	divPost.appendChild(delete_button);
 	delete_button.addEventListener("click",function(){
-		post_list.splice(selectedPost[0].index,1);
+		DeleteAllComment();
+		post_list.splice(selectedPost[0].index,1);    //delete comments of this post
 		localStorage.selectedPosts= JSON.stringify([]);
 		storePost(post_list);
+		storeCommentsIntoLocalStorage(comments);
 		window.location.assign("indexPage.html");
 	});
 	
@@ -95,26 +98,42 @@ function createPost(){
 	
 	post.appendChild(divPost);
 	newLine(divPost);
-	newLine(divPost);
-	newLine(divPost);
+	//newLine(divPost);
+	//newLine(divPost);
 	horizontalLine(divPost);
-	newLine(divPost);
-	newLine(divPost);
-	var viewComment=document.createElement("button");
+	//newLine(divPost);
+	//newLine(divPost);
+	var viewComment=document.createElement("a");
 	viewComment.setAttribute("id","viewComment");
 	viewComment.innerHTML="View Comment";
+	viewComment.style.fontSize="19px";
+	viewComment.style.cursor="pointer";
 	divPost.appendChild(viewComment);
 	viewComment.addEventListener("click",function(event){
 		if(view_comment==0){
+			viewComment.innerHTML="Hide Comment";
 			createComment();
 			view_comment=1;
 		}
+		else if(view_comment==1 && viewComment.innerHTML==="Hide Comment")
+		{
+			viewComment.innerHTML="View Comment";
+			commentDiv.parentNode.removeChild(commentDiv);
+			addComment.parentNode.removeChild(addComment);
+			view_comment=0;
+		}
 	});
-	
-	
-	
 }
-
+function DeleteAllComment()
+{
+	for(var i=comments.length-1;i>=0;i--)
+{
+	if(post_list[selectedPost[0].index].id===comments[i].PostId)
+	{
+	comments.splice(i,1);
+	}
+}
+}
 function storeIntoLocalStorage()
 {
 	if (!localStorage.comments)
@@ -134,12 +153,8 @@ function createComment()
 	var commentDiv=document.createElement("div");
 	commentDiv.setAttribute("id","commentDiv");
 	divPost.appendChild(commentDiv);
-	newLine(divPost);
-	newLine(divPost);
-	
-	comments=storeIntoLocalStorage();
-
-
+	//newLine(divPost);
+	//newLine(divPost);
 for(var i=0;i<comments.length;i++)
 {
 	if(post_list[selectedPost[selectedPost.length-1].index].id===comments[i].PostId)
@@ -147,25 +162,24 @@ for(var i=0;i<comments.length;i++)
 	commentId=comments[i].CommentId;
 	AddToCommentDom(comments[i]);
 	}
-	
-	
 }
 var addComment=document.createElement("button");
 	addComment.setAttribute("id","addComment");
 	addComment.innerHTML="Add Comment";
 	divPost.appendChild(addComment);
-	newLine(divPost);
+	//newLine(divPost);
 		
 		
 	addComment.addEventListener("click",function(event){
 		if(comment_box==0){
 		flag=0;
+		hideAllBtn();
 		createPostComment();
 		comment_box=1;
 		}
 });
 	
-		newLine(divPost);
+		//newLine(divPost);
 		}
 function createPostComment()
 	{
@@ -174,6 +188,7 @@ function createPostComment()
 	postCommentDiv.style.backgroundColor="lightgray";
     postCommentDiv.style.width="621px";
     postCommentDiv.style.height="202px";
+	postCommentDiv.style.marginTop="20px";
 	divPost.appendChild(postCommentDiv);
 	newLine(postCommentDiv);
 	var comment=document.createElement("textarea");
@@ -184,6 +199,7 @@ function createPostComment()
 	comment.style.height="125px";
 	comment.style.width="526px";
 	postCommentDiv.appendChild(comment);
+	comment.focus();
 	newLine(postCommentDiv);
 	newLine(postCommentDiv);
 	
@@ -207,19 +223,21 @@ function createPostComment()
 	postCommentDiv.appendChild(postbtn);
 	cancelBtn.addEventListener("click",function(event){
 		comment_box=0;
+		visibleAllBtn();
 		deleteDiv();
 	});
 	if(flag==0)
 	{
 	postbtn.addEventListener("click",function(event){
 	
-	if(!postbtn.innerHTML){
+	if(!comment.value){
 		alert("Comment can't be empty");
 	}else{
 			comment_box=0;
 		commentId++;
 		AddToCommentArray();
 		deleteDiv();
+		visibleAllBtn();
 		storeCommentsIntoLocalStorage(comments);
 	}
 	});
@@ -241,23 +259,27 @@ function AddToCommentDom(obj)
 		var createNewDiv=document.createElement("div");
 		createNewDiv.setAttribute("id",commentId);
 
-				newLine(createNewDiv);
-				newLine(createNewDiv);
+				//newLine(createNewDiv);
+				//newLine(createNewDiv);
+				
 				newLine(createNewDiv);
 		var commentValue=document.createElement("label");
 		commentValue.innerHTML=obj.value;
 		createNewDiv.appendChild(commentValue);
 		
 		newLine(createNewDiv);
-		var cEdit=document.createElement("button");
+		var cEdit=document.createElement("a");
 		cEdit.setAttribute("id","cEdit");
 		cEdit.innerHTML="Edit";
+		cEdit.style.cursor="pointer";
 		createNewDiv.appendChild(cEdit);
 			
 		cEdit.addEventListener("click",function(event){
 			var targetParent=event.target.parentNode;
 			var index=getIndex(parseInt(targetParent.id));
 			flag=1;
+			hideAllBtn();
+			document.getElementById("addComment").style.visibility="hidden";
 			createPostComment();
 			document.getElementById("comment").value=comments[index].value;
 			var getIdOfPost=document.getElementById("postbtn");
@@ -265,13 +287,25 @@ function AddToCommentDom(obj)
 		commentValue.innerHTML=document.getElementById("comment").value;
 		comments[index].value=document.getElementById("comment").value;
 		deleteDiv();
+		visibleAllBtn();
+		cEdit.focus();
+			document.getElementById("addComment").style.visibility="visible";
 		storeCommentsIntoLocalStorage(comments);
+		
+		});
+	var getIdOfCancelBtn=document.getElementById("cancelBtn");
+	getIdOfCancelBtn.addEventListener("click",function(event){
+			visibleAllBtn();
+			cEdit.focus();
+			document.getElementById("addComment").style.visibility="visible";
 	});
 		});
 		
-		var cDelete=document.createElement("button");
+		var cDelete=document.createElement("a");
 		cDelete.setAttribute("id","cDelete");
 		cDelete.innerHTML="Delete";
+		cDelete.style.cursor="pointer";
+		cDelete.style.marginLeft="28px";
 		createNewDiv.appendChild(cDelete);
 		
 		cDelete.addEventListener("click",function(event){
@@ -281,7 +315,7 @@ function AddToCommentDom(obj)
 			targetParent.parentNode.removeChild(targetParent);
 			storeCommentsIntoLocalStorage(comments);
 		});
-		
+		horizontalLine(createNewDiv);
 			commentDiv.appendChild(createNewDiv);
 	}
 	function removeFromCommentArray(index)
@@ -312,4 +346,32 @@ function AddToCommentDom(obj)
 	function storeCommentsIntoLocalStorage(comments)
 	{
 		localStorage.comments=JSON.stringify(comments);
+	}
+	function hideAllBtn()
+	{
+		for(var i=1;i<=commentId;i++)
+		{
+			
+			var a=document.getElementById(i);
+			if(a!=null)
+			{
+			var b=a.getElementsByTagName("a");
+			b[0].style.visibility="hidden";
+			b[1].style.visibility="hidden";
+			}
+		}
+	}
+	function visibleAllBtn()
+	{
+		for(var i=1;i<=commentId;i++)
+		{
+			
+			var a=document.getElementById(i);
+			if(a!=null)
+			{
+			var b=a.getElementsByTagName("a");
+			b[0].style.visibility="visible";
+			b[1].style.visibility="visible";
+			}
+		}
 	}
